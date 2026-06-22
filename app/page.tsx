@@ -98,6 +98,20 @@ export default function Dashboard() {
         return;
       }
 
+      setRegisteredDevices((prev) => {
+        if (!prev[deviceId]) return prev;
+
+        return {
+          ...prev,
+          [deviceId]: {
+            ...prev[deviceId],
+            status: "Online",
+            umidade: prev[deviceId].umidade ?? -1,
+            lastSeen: new Date().toLocaleTimeString(),
+          },
+        };
+      });
+
       if (payload.includes("D:") && payload.includes(",R:")) {
         const umidade = parseInt(payload.split("D:")[1].split(",R:")[0]);
         const bomba = payload.split(",R:")[1] === "1";
@@ -324,8 +338,8 @@ export default function Dashboard() {
                     <strong
                       className={`text-sm ${disp.status === "Offline" ? "text-slate-400 dark:text-slate-600" : disp.umidade > 3200 ? "text-amber-600" : "text-sky-600"}`}
                     >
-                      {disp.status === "Online"
-                        ? `${disp.umidade} ${"" /*disp.umidade > 3200 ? "🌵" : "💧" */}`
+                      {disp.status === "Online" && disp.umidade >= 0
+                        ? `${disp.umidade}`
                         : "--"}
                     </strong>
                   </div>
