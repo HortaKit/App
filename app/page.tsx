@@ -175,9 +175,12 @@ const GraficoUmidade = ({
             borderRadius: "8px",
             fontSize: "12px",
           }}
-          formatter={(value: number, name: string) => {
-            if (name === "umidade") return [value, "Umidade"];
-            return [value === 1 ? "Ligada" : "Desligada", "Bomba"];
+          formatter={(value, name) => {
+            if (name === "umidade") {
+              return [value, "Umidade"];
+            }
+
+            return [Number(value) === 1 ? "Ligada" : "Desligada", "Bomba"];
           }}
           labelFormatter={(label) => `⏱ ${label}`}
         />
