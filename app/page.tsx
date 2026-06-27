@@ -303,6 +303,7 @@ export default function Dashboard() {
     });
 
     client.on("connect", () => {
+      client.subscribe("dispositivos/+/status");
       client.subscribe("dispositivos/+/telemetria");
       client.subscribe("dispositivos/+/historico");
     });
@@ -357,19 +358,28 @@ export default function Dashboard() {
         return;
       }
 
-      // ── Telemetria ─────────────────────────────────────────────────
-      if (payload === "OFFLINE") {
+      // ── status ─────────────────────────────────────────────────
+      if (category === "status") {
+        const status = payload === "ONLINE_INIT" ? "Online" : "Offline";
+
         setRegisteredDevices((prev) => {
           if (!prev[deviceId]) return prev;
           return {
             ...prev,
-            [deviceId]: { ...prev[deviceId], status: "Offline" },
+            [deviceId]: { ...prev[deviceId], status },
           };
         });
+
+        setDiscoveredDevices((prev) => ({ ...prev }));
         return;
       }
 
-      if (payload.includes("D:") && payload.includes(",R:")) {
+      // ── telemetria ───────────────────────────────────────────────
+      if (
+        category === "telemetria" &&
+        payload.includes("D:") &&
+        payload.includes(",R:")
+      ) {
         const umidade = parseInt(payload.split("D:")[1].split(",R:")[0]);
         const bomba = payload.split(",R:")[1].trim() === "1";
 
@@ -381,7 +391,6 @@ export default function Dashboard() {
               ...prev[deviceId],
               umidade,
               bomba,
-              status: "Online",
               lastSeen: new Date().toLocaleTimeString(),
             },
           };
