@@ -362,6 +362,10 @@ export default function Dashboard() {
       if (category === "status") {
         const status = payload === "ONLINE_INIT" ? "Online" : "Offline";
 
+        if (payload === "ONLINE_INIT") {
+          setDiscoveredDevices((prev) => ({ ...prev, [deviceId]: status }));
+        }
+
         setRegisteredDevices((prev) => {
           if (!prev[deviceId]) return prev;
           return {
@@ -369,8 +373,6 @@ export default function Dashboard() {
             [deviceId]: { ...prev[deviceId], status },
           };
         });
-
-        setDiscoveredDevices((prev) => ({ ...prev, [deviceId]: status }));
         return;
       }
 
@@ -788,7 +790,9 @@ export default function Dashboard() {
                     className={`text-xl font-black ${isDarkMode ? "text-white" : "text-slate-900"}`}
                   >
                     {activeDevice.status === "Online"
-                      ? activeDevice.umidade
+                      ? activeDevice.umidade > 0
+                        ? activeDevice.umidade
+                        : "---"
                       : "--"}
                   </span>
                 </div>
@@ -803,9 +807,11 @@ export default function Dashboard() {
                 >
                   {activeDevice.status === "Offline"
                     ? "Aparelho Desconectado"
-                    : activeDevice.umidade > 3200
-                      ? "Solo Crítico"
-                      : "Solo Estabilizado"}
+                    : activeDevice.umidade <= 0
+                      ? "---"
+                      : activeDevice.umidade > 3200
+                        ? "Solo Crítico"
+                        : "Solo Estabilizado"}
                 </span>
               </div>
 
@@ -837,7 +843,7 @@ export default function Dashboard() {
                 <div className="flex gap-2">
                   <button
                     disabled={
-                      activeDevice.bomba || activeDevice.status === "Offline"
+                      true /** activeDevice.bomba || activeDevice.status === "Offline" */
                     }
                     onClick={() => handleTogglePump(activeDevice.id, false)}
                     className={`flex-1 hover:cursor-pointer py-2.5 rounded-xl font-bold text-xs transition-all text-white ${
@@ -853,7 +859,7 @@ export default function Dashboard() {
                         : "Abrir Fluxo"}
                   </button>
                   <button
-                    disabled={activeDevice.status === "Offline"}
+                    disabled={true /** activeDevice.status === "Offline" */}
                     onClick={() => handleTogglePump(activeDevice.id, true)}
                     className={`flex-1 hover:cursor-pointer py-2.5 rounded-xl font-bold text-xs transition-all text-white shadow-sm ${
                       activeDevice.status === "Offline"
