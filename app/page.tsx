@@ -244,7 +244,7 @@ export default function Dashboard() {
     [id: string]: Dispositivo;
   }>({});
   const [discoveredDevices, setDiscoveredDevices] = useState<{
-    [id: string]: number;
+    [id: string]: string | number;
   }>({});
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -370,7 +370,7 @@ export default function Dashboard() {
           };
         });
 
-        setDiscoveredDevices((prev) => ({ ...prev }));
+        setDiscoveredDevices((prev) => ({ ...prev, [deviceId]: status }));
         return;
       }
 
@@ -429,7 +429,7 @@ export default function Dashboard() {
     const newDevice: Dispositivo = {
       id,
       nome: finalName,
-      umidade: discoveredDevices[id] || 0,
+      umidade: -1,
       bomba: false,
       status: "Online",
       lastSeen: new Date().toLocaleTimeString(),
